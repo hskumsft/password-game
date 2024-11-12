@@ -12,9 +12,9 @@ on:
         required: true
         default: Beta
 env:
-  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  ARM_TENANT_ID: ${{ vars.ARM_TENANT_ID }}
+  ARM_CLIENT_ID: ${{ vars.ARM_CLIENT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}
   ARM_USE_OIDC: true
 
 permissions:
@@ -29,7 +29,7 @@ jobs:
     env:
       AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
       AZURE_TFSTATE_RESOURCE_GROUP: ${{ vars.AZURE_TFSTATE_RESOURCE_GROUP }}
-      AZURE_TFSTATE_STORAGE_ACCOUNT: ${{ secrets.AZURE_TFSTATE_STORAGE_ACCOUNT }}
+      AZURE_TFSTATE_STORAGE_ACCOUNT: ${{ vars.AZURE_TFSTATE_STORAGE_ACCOUNT }}
       GITHUB_ENVIRONMENT: ${{ ((github.event_name == 'push') && ((github.ref_name == 'main' || github.ref_name == 'backup') && github.ref_name || 'Beta')) || github.event.inputs.githubEnv }}
     defaults:
       run:
