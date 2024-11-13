@@ -97,8 +97,29 @@ resource "azurerm_linux_web_app" "dog_game" {
   }  
 }
 
-resource "azurerm_linux_function_app" "backend_api" {
+resource "azurerm_signalr_service" "chat_service" {
   depends_on = [azurerm_linux_web_app.dog_game]
+  name                = "${local.service_prefix}-signalr-${random_string.service_suffix.id}"
+  location            = azurerm_resource_group.main_rg.location
+  resource_group_name = azurerm_resource_group.main_rg.name
+  sku {
+    name     = "Free_F1"
+    capacity = 1
+  }
+  cors {
+    allowed_origins = [
+      "https://${azurerm_linux_web_app.cat_game.default_hostname}",
+      "https://${azurerm_linux_web_app.dog_game.default_hostname}",
+    ]
+  }
+  service_mode = "Serverless"
+  timeouts {
+    create = "10m"
+  }  
+}
+
+resource "azurerm_linux_function_app" "backend_api" {
+  depends_on = [azurerm_signalr_service.chat_service]
   name                       = "${local.service_prefix}-backend-api-${random_string.service_suffix.id}"
   location                   = azurerm_resource_group.main_rg.location
   resource_group_name        = azurerm_resource_group.main_rg.name
@@ -125,27 +146,6 @@ resource "azurerm_linux_function_app" "backend_api" {
       support_credentials = true
     }
   }
-  timeouts {
-    create = "10m"
-  }  
-}
-
-resource "azurerm_signalr_service" "chat_service" {
-  depends_on = [azurerm_linux_function_app.backend_api]
-  name                = "${local.service_prefix}-signalr-${random_string.service_suffix.id}"
-  location            = azurerm_resource_group.main_rg.location
-  resource_group_name = azurerm_resource_group.main_rg.name
-  sku {
-    name     = "Free_F1"
-    capacity = 1
-  }
-  cors {
-    allowed_origins = [
-      "https://${azurerm_linux_web_app.cat_game.default_hostname}",
-      "https://${azurerm_linux_web_app.dog_game.default_hostname}",
-    ]
-  }
-  service_mode = "Serverless"
   timeouts {
     create = "10m"
   }  
