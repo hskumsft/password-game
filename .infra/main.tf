@@ -32,13 +32,18 @@ resource "azurerm_resource_group" "main_rg" {
 }
 
 resource "azurerm_application_insights" "main_ai" {
+  depends_on = [azurerm_resource_group.main_rg]
   name                = "${local.service_prefix}-ai-${random_string.service_suffix.id}"
   location            = azurerm_resource_group.main_rg.location
   resource_group_name = azurerm_resource_group.main_rg.name
   application_type    = "web"
+  timeouts {
+    create = "10m"
+  }  
 }
 
 resource "azurerm_storage_account" "main_storage" {
+  depends_on = [azurerm_application_insights.main_ai]
   name                     = "${local.service_prefix}stg${random_string.service_suffix.id}"
   location                 = azurerm_resource_group.main_rg.location
   resource_group_name      = azurerm_resource_group.main_rg.name
@@ -46,17 +51,25 @@ resource "azurerm_storage_account" "main_storage" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
   access_tier              = "Hot"
+  timeouts {
+    create = "10m"
+  }  
 }
 
 resource "azurerm_service_plan" "main_plan" {
+  depends_on = [azurerm_storage_account.main_storage]
   name                = "${local.service_prefix}-apps-${random_string.service_suffix.id}"
   location            = azurerm_resource_group.main_rg.location
   resource_group_name = azurerm_resource_group.main_rg.name
   os_type             = "Linux"
   sku_name            = "B1"
+  timeouts {
+    create = "10m"
+  }  
 }
 
 resource "azurerm_linux_web_app" "cat_game" {
+  depends_on = [azurerm_service_plan.main_plan]
   name                = "${local.service_prefix}-cat-game-${random_string.service_suffix.id}"
   location            = azurerm_resource_group.main_rg.location
   resource_group_name = azurerm_resource_group.main_rg.name
@@ -69,6 +82,7 @@ resource "azurerm_linux_web_app" "cat_game" {
 }
 
 resource "azurerm_linux_web_app" "dog_game" {
+  depends_on = [azurerm_linux_web_app.cat_game]
   name                = "${local.service_prefix}-dog-game-${random_string.service_suffix.id}"
   location            = azurerm_resource_group.main_rg.location
   resource_group_name = azurerm_resource_group.main_rg.name
@@ -78,9 +92,13 @@ resource "azurerm_linux_web_app" "dog_game" {
   app_settings = {
     "APPINSIGHTS_INSTRUMENTATIONKEY" = azurerm_application_insights.main_ai.instrumentation_key
   }
+  timeouts {
+    create = "10m"
+  }  
 }
 
 resource "azurerm_linux_function_app" "backend_api" {
+  depends_on = [azurerm_linux_web_app.dog_game]
   name                       = "${local.service_prefix}-backend-api-${random_string.service_suffix.id}"
   location                   = azurerm_resource_group.main_rg.location
   resource_group_name        = azurerm_resource_group.main_rg.name
@@ -107,26 +125,30 @@ resource "azurerm_linux_function_app" "backend_api" {
       support_credentials = true
     }
   }
+  timeouts {
+    create = "10m"
+  }  
 }
 
 resource "azurerm_signalr_service" "chat_service" {
+  depends_on = [azurerm_linux_function_app.backend_api]
   name                = "${local.service_prefix}-signalr-${random_string.service_suffix.id}"
   location            = azurerm_resource_group.main_rg.location
   resource_group_name = azurerm_resource_group.main_rg.name
-
   sku {
     name     = "Free_F1"
     capacity = 1
   }
-
   cors {
     allowed_origins = [
       "https://${azurerm_linux_web_app.cat_game.default_hostname}",
       "https://${azurerm_linux_web_app.dog_game.default_hostname}",
     ]
   }
-
   service_mode = "Serverless"
+  timeouts {
+    create = "10m"
+  }  
 }
 
 output "app_insights_instrumentation_key" {
