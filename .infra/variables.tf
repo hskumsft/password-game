@@ -10,7 +10,7 @@ variable "azure_environment" {
 variable "azure_region" {
   description = "The Azure region in which to deploy the resource group"
   type        = string
-  default     = "westus2"
+  default     = "westus"
 }
 
 variable "azure_resource_group_name" {
