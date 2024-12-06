@@ -12,8 +12,8 @@ app.http('chatDeleteMessage', {
     methods: ['POST'],
     authLevel: 'anonymous',
     extraOutputs: [signalR],
-    handler: (request, context) => {
-        const messageId = request.json['messageId'];
+    handler: async (request, context) => {
+        const messageId = await request.json()['messageId'];
         
         if (!messageId) {
             return {
