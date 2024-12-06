@@ -1,19 +1,31 @@
-import { AzureFunction, Context, HttpRequest } from "@azure/functions";
+import { app, input } from '@azure/functions';
 import { UserAsTableEntity, UserFromTableEntity } from "@pwdgame/shared";
+ 
+const tableInput = input.table({
+    connection: 'StorageAccountConnectionString',
+    partitionKey: '{username}',
+    tableName: 'User',
+    rowKey: '{username}',
+});
+ 
+app.http('getUser', {
+    methods: ['GET'],
+    authLevel: 'anonymous',
+    route: 'User/{username}',
+    extraInputs: [tableInput],
+    handler: async (request, context) => {
+        const userEntity = context.extraInputs.get(tableInput);
 
-const getUser: AzureFunction = async (context: Context, req: HttpRequest, userEntity: UserAsTableEntity) => {
-    if(!userEntity) {
-        context.res = {
-            status: 404,
-            body: "User not found"
+        if(!userEntity) {
+            return {
+                status: 404,
+                body: "User not found"
+            };
+        }
+
+        return { 
+            status: 200,
+            jsonbody: UserFromTableEntity(userEntity as UserAsTableEntity),
         };
-        return;
-    }
-
-    context.res = {
-        status: 200,
-        body: UserFromTableEntity(userEntity)
-    };
-};
-
-export default getUser;
+    },
+});
