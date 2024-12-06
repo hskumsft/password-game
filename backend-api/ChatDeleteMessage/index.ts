@@ -1,29 +1,34 @@
-import { AzureFunction, Context, HttpRequest } from "@azure/functions";
-import Profanity from "profanity-js";
-import { ChatServiceMethod, ChatMessage, ChatDeletionCommand } from "@pwdgame/shared";
-import { v4 as uuid } from "uuid";
+import { app, output } from "@azure/functions";
+import { ChatServiceMethod, ChatDeletionCommand } from "@pwdgame/shared";
 
-const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<any> {
-    const messageId = req.body?.messageId;
+const signalR = output.generic({
+    type: 'signalR',
+    name: 'signalR',
+    hubName: 'chat',
+    connectionStringSetting: 'SignalRConnectionString',
+});
 
-    if (!messageId) {
-        context.res = {
-            status: 400,
-            body: "Invalid chat message arguments"
-        };
-        return;
+app.http('chatDeleteMessage', {
+    methods: ['POST'],
+    authLevel: 'anonymous',
+    extraOutputs: [signalR],
+    handler: (request, context) => {
+        const messageId = request.json['messageId'];
+        
+        if (!messageId) {
+            return {
+                status: 400,
+                body: "Invalid chat message arguments"
+            }
+        }
+
+        const arg: ChatDeletionCommand = { messageId };
+
+        context.extraOutputs.set(signalR, {
+            "target": ChatServiceMethod.DeleteMessage,
+            "arguments": [arg]
+        });
+
+        return { status: 201 }
     }
-
-    context.res = {
-        status: 201
-    };
-
-    const arg: ChatDeletionCommand = { messageId };
-
-    return {
-        target: ChatServiceMethod.DeleteMessage,
-        arguments: [arg]
-    };
-};
-
-export default httpTrigger;
+});
