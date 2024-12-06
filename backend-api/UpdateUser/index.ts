@@ -1,9 +1,8 @@
+import { app } from '@azure/functions';
 import { TableClient } from "@azure/data-tables";
 import Profanity from "profanity-js";
 import { UserWithSecurityAttrs, UserToTableEntity } from "@pwdgame/shared";
 import { UserTableName, DefaultOperationOptions } from "../Settings";
-
-const { app } = require('@azure/functions');
 
 const isValidUser = (user: any): user is UserWithSecurityAttrs => {
     return user
