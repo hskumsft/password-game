@@ -30,5 +30,6 @@ app.http('chatDeleteMessage', {
         });
 
         return { status: 201 }
-    }
+    },
+    route: 'chat/deletemessage',
 });
