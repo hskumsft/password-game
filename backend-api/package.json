@@ -14,10 +14,11 @@
         "@pwdgame/shared": "file:../shared",
         "profanity-js": "^0.1.4",
         "uuid": "^9.0.0"
-    },
+    },      
     "devDependencies": {
         "@types/node": "^18.15.3",
         "@types/uuid": "^9.0.1",
         "typescript": "^5.0.2"
-    }
+    },
+    "main": "dist/src/functions/*.js"
 }
