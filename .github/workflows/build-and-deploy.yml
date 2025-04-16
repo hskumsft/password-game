@@ -118,7 +118,6 @@ jobs:
         with:
           app-name: ${{ needs.terraform.outputs.backend_api_func_app_name }}
           package: ./backend-api
-          verbose: true
 
   deploy-apps:
     name: Build/Deploy Apps
@@ -170,10 +169,8 @@ jobs:
         with:
           app-name: ${{ needs.terraform.outputs.cat_game_app_service_name }}
           package: ./cat-game/dist
-          verbose: true
       - name: Deploy dog-game
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ needs.terraform.outputs.dog_game_app_service_name }}
           package: ./dog-game/dist
-          verbose: true
