@@ -24,7 +24,6 @@ export default class PhishedComponent extends Vue {
 
   interval: ReturnType<typeof setInterval> | null = null;
 
-  redirected = false;
   countdown = 5;
 
   mounted() {
@@ -34,12 +33,16 @@ export default class PhishedComponent extends Vue {
 
     // Redirect user to a different URL after a short delay
     const countdownInterval = setInterval(() => {
-      this.countdown--;
+      if (this.countdown >= 0)
+      {
+        this.countdown--;
+      }
+
       if (this.countdown <= 0) {
-        this.redirected = true;
-        // Open a new tab with the target URL
-        window.open("https://pwdgame-cat-game-nzzd2o4k.azurewebsites.net", "_blank");
-        clearInterval(countdownInterval);
+        setTimeout(() => {
+          window.location.href = "https://pwdgame-cat-game-nzzd2o4k.azurewebsites.net";
+          clearInterval(countdownInterval);
+        }, 1000); // 1 second delay before redirect
       }
     }, 1000);
   }
@@ -81,10 +84,6 @@ export default class PhishedComponent extends Vue {
       <h4 class="alert-heading">Oh no!</h4>
       <p class="">Sorry, I guess this website isn't working properly.</p>
       <p class="pb-0">Redirecting you back to the chat game in {{countdown}} seconds...</p>
-    </div>
-    <div v-else class="alert alert-success">
-      <h4 class="alert-heading">You've been redirected!</h4>
-      <p class="">We've opened a new tab for the chat game, please use the new tab.</p>
     </div>
   </div>
 </template>
