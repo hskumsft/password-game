@@ -36,10 +36,10 @@ export default class PhishedComponent extends Vue {
     const countdownInterval = setInterval(() => {
       this.countdown--;
       if (this.countdown <= 0) {
-        clearInterval(countdownInterval);
+        this.redirected = true;
         // Open a new tab with the target URL
         window.open("https://pwdgame-cat-game-nzzd2o4k.azurewebsites.net", "_blank");
-        this.redirected = true;
+        clearInterval(countdownInterval);
       }
     }, 1000);
   }
