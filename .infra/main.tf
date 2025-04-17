@@ -78,6 +78,7 @@ resource "azurerm_linux_web_app" "cat_game" {
   site_config {}
   app_settings = {
     "APPINSIGHTS_INSTRUMENTATIONKEY" = azurerm_application_insights.main_ai.instrumentation_key
+    "WEBSITE_RUN_FROM_PACKAGE" = 1
   }
 }
 
@@ -91,6 +92,7 @@ resource "azurerm_linux_web_app" "dog_game" {
   site_config {}
   app_settings = {
     "APPINSIGHTS_INSTRUMENTATIONKEY" = azurerm_application_insights.main_ai.instrumentation_key
+    "WEBSITE_RUN_FROM_PACKAGE" = 1
   }
   timeouts {
     create = "10m"
@@ -131,6 +133,7 @@ resource "azurerm_linux_function_app" "backend_api" {
     "NODE_ENV"                       = "production",
     "StorageAccountConnectionString" = azurerm_storage_account.main_storage.primary_connection_string
     "SignalRConnectionString"        = azurerm_signalr_service.chat_service.primary_connection_string
+    "WEBSITE_RUN_FROM_PACKAGE"       = 1
   }
   site_config {
     always_on = true

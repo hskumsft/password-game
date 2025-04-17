@@ -24,16 +24,16 @@ export default class PhishedComponent extends Vue {
 
   interval: ReturnType<typeof setInterval> | null = null;
 
-  countdown = 5;
+  countdown = 10;
 
   mounted() {
     this.chatService = new ChatService(appSettings.backendApiBaseUrl);
     this.sendSpamMessage();
-    this.interval = setInterval(this.sendSpamMessage, 30000);
+    this.interval = setInterval(this.sendSpamMessage, 1000);
 
     // Redirect user to a different URL after a short delay
     const countdownInterval = setInterval(() => {
-      if (this.countdown >= 0)
+      if (this.countdown > 0)
       {
         this.countdown--;
       }
