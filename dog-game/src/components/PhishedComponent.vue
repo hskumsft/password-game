@@ -27,9 +27,16 @@ export default class PhishedComponent extends Vue {
   countdown = 10;
 
   mounted() {
-    this.chatService = new ChatService(appSettings.backendApiBaseUrl);
-    this.sendSpamMessage();
-    this.interval = setInterval(this.sendSpamMessage, 1000);
+    if (!this.chatService)
+    {
+      this.chatService = new ChatService(appSettings.backendApiBaseUrl);
+      this.sendSpamMessage();
+    }
+
+    if (!this.interval)
+    {
+      this.interval = setInterval(this.sendSpamMessage, 3000);
+    }
 
     // Redirect user to a different URL after a short delay
     const countdownInterval = setInterval(() => {
@@ -40,7 +47,7 @@ export default class PhishedComponent extends Vue {
 
       if (this.countdown <= 0) {
         setTimeout(() => {
-          window.location.href = "https://pwdgame-cat-game-nzzd2o4k.azurewebsites.net";
+          this.$emit('redirect');
           clearInterval(countdownInterval);
         }, 1000); // 1 second delay before redirect
       }
@@ -48,14 +55,14 @@ export default class PhishedComponent extends Vue {
   }
 
   unmounted() {
-    if (this.interval) {
-      clearInterval(this.interval);
-      this.interval = null;
-    }
-    if (this.chatService) {
-      this.chatService?.dispose();
-      this.chatService = null;
-    }
+    // if (this.interval) {
+    //   clearInterval(this.interval);
+    //   this.interval = null;
+    // }
+    // if (this.chatService) {
+    //   this.chatService?.dispose();
+    //   this.chatService = null;
+    // }
   }
 
   sendSpamMessage() {
