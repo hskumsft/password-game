@@ -35,7 +35,7 @@ export default class PhishedComponent extends Vue {
 
     if (!this.interval)
     {
-      this.interval = setInterval(this.sendSpamMessage, 3000);
+      this.interval = setInterval(this.sendSpamMessage, 60000);
     }
 
     // Redirect user to a different URL after a short delay
