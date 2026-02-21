@@ -16,7 +16,8 @@ export type ChatListener =
     { method: ChatServiceMethod.DeleteMessage, listener: ChatDeletionListener };
 
 export class ChatService {
-    private readonly connection: Promise<HubConnection>;
+    private readonly connection: Promise<HubConnection | null>;
+    private connectionStartError: Error | null = null;
     private readonly listeners = {} as { [id: string]: ChatListener }
 
     constructor(private readonly apiBaseUrl: string) {
@@ -29,11 +30,22 @@ export class ChatService {
         _conn.on(ChatServiceMethod.DeleteMessage,
             (cmd: ChatDeletionCommand) => this.onMessage(ChatServiceMethod.DeleteMessage, cmd));
 
-        this.connection = _conn.start().then(() => _conn);
+        this.connection = _conn
+            .start()
+            .then(() => _conn)
+            .catch(err => {
+                this.connectionStartError = err instanceof Error
+                    ? err
+                    : new Error("Failed to connect to chat service.");
+                return null;
+            });
     }
 
     public async sendMessage(message: Omit<ChatMessage, "messageId">) {
-        await this.connection;
+        const connection = await this.connection;
+        if (!connection) {
+            throw this.connectionStartError ?? new Error("Failed to connect to chat service.");
+        }
         const resp = await fetch(`${this.apiBaseUrl}api/chat/sendmessage`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -49,7 +61,10 @@ export class ChatService {
     }
 
     public async deleteMessage(messageId: string) {
-        await this.connection;
+        const connection = await this.connection;
+        if (!connection) {
+            throw this.connectionStartError ?? new Error("Failed to connect to chat service.");
+        }
         const resp = await fetch(`${this.apiBaseUrl}api/chat/deletemessage`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -65,7 +80,10 @@ export class ChatService {
     }
 
     public async dispose() {
-        await (await this.connection).stop();
+        const connection = await this.connection;
+        if (connection) {
+            await connection.stop();
+        }
     }
 
     public addMessageListener(listener: ChatListener) {

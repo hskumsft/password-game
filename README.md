@@ -3,13 +3,13 @@
 This project is intended to demonstrate some basic concepts around personal account security and password hygiene.
 
 ## Local debugging
-You can run and debug the entire solution locally using Azure Functions tools and the Azure Storage emulator.
+You can run and debug the entire solution locally using Azure Functions tools and Azurite.
 
 ### Setup your dev environment
 
-1. Install the [Azure Storage Emulator](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator#get-the-storage-emulator).
+1. Install [Azurite](https://learn.microsoft.com/en-us/azure/storage/common/storage-install-azurite) (or use `npm run start:azurite` from the repo root, which starts Azurite on ports `11000-11002`).
 2. Install the [Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local?tabs=windows%2Ccsharp%2Cbash#install-the-azure-functions-core-tools).
-3. Install [NodeJS](https://nodejs.org/). (Note: please refer the version compatibility between NodeJS ad Azure function, refer link [here](https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-node?tabs=javascript%2Cwindows%2Cazure-cli&pivots=nodejs-model-v4#supported-versions))
+3. Install [NodeJS](node). (Note: please refer the version compatibility between NodeJS ad Azure function, refer link [here](https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-node?tabs=javascript%2Cwindows%2Cazure-cli&pivots=nodejs-model-v4#supported-versions))
 4. Install [Visual Studio Code](https://code.visualstudio.com/).
 
 ### Get a SignalR instance
@@ -33,7 +33,13 @@ popd
 
 ### Run the solution
 
-Start the Azure Storage Emulator by launching it from the start menu. An icon will appear in the taskbar.
+Start Azurite before running the backend:
+
+```bash
+npm run start:azurite
+```
+
+The backend settings in `backend-api/local.settings.json` are configured to use these Azurite ports.
 
 #### From VS Code
 

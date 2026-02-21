@@ -12,6 +12,7 @@
         "@azure/data-tables": "^13.2.1",
         "@azure/functions": "^3.5.0",
         "@pwdgame/shared": "file:../shared",
+        "password-game": "file:..",
         "profanity-js": "^0.1.4",
         "uuid": "^9.0.0"
     },
